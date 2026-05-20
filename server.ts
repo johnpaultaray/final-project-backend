@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import 'dotenv/config';
 import cors from 'cors';
 import errorHandler from './_middleware/error-handler';
 import accountsController from './accounts/accounts.controller';
@@ -12,10 +13,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
-    credentials: true
-}));
+// allow cors requests from frontend and with credentials
+app.use(cors({ origin: ['http://localhost:4200', 'http://localhost:8081', 'http://localhost:8080'], credentials: true }));
 // api routes
 app.use('/accounts', accountsController);
 
