@@ -9,17 +9,20 @@ import swaggerDocs from './_helpers/swagger';
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
+// Parses urlencoded bodies (extended: true allows handling the rich HTML form data safely)
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 // allow cors requests from frontend and with credentials
 app.use(cors({ origin: ['http://localhost:4200', 'http://localhost:8081', 'http://localhost:8080'], credentials: true }));
+
 // api routes
 app.use('/accounts', accountsController);
 
 // swagger docs route
 app.use('/api-docs', swaggerDocs);
+
 // global error handler
 app.use(errorHandler);
 

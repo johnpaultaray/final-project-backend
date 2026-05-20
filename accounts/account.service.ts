@@ -23,6 +23,8 @@ export default {
     delete: _delete
 };
 
+// ... keep all your other service functions (authenticate, register, validateResetToken, etc.) exactly the same ...
+
 async function authenticate({ email, password, ipAddress }: any) {
     const account = await db.Account.scope('withHash').findOne({ where: { email } });
     if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
@@ -38,6 +40,7 @@ async function authenticate({ email, password, ipAddress }: any) {
         refreshToken: refreshToken.token
     };
 }
+
 async function refreshToken({ token, ipAddress }: any) {
     const refreshToken = await getRefreshToken(token);
     const account = await refreshToken.getAccount();
@@ -102,15 +105,19 @@ async function forgotPassword({ email }: any, origin: any) {
     await sendPasswordResetEmail(account, origin);
 }
 
-async function validateResetToken({ token }: any) {
+async function validateResetToken(params: any) {
+    const token = typeof params === 'string' ? params : (params?.token || null);
+
+    if (!token) throw 'Invalid token';
+
     const account = await db.Account.findOne({
         where: {
             resetToken: token,
-            resetTokenExpires: { [Op.gt]: Date.now() }
+            resetTokenExpires: { [Op.gt]: new Date() }
         }
     });
 
-    if (!account) throw 'Invalid token';
+    if (!account) throw 'Invalid or expired token';
 
     return account;
 }
@@ -121,6 +128,7 @@ async function resetPassword({ token, password }: any) {
     account.passwordHash = await hash(password);
     account.passwordReset = Date.now();
     account.resetToken = null;
+    account.resetTokenExpires = null; 
     await account.save();
 }
 
@@ -136,7 +144,7 @@ async function getById(id: any) {
 
 async function create(params: any) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
-        throw "Email" + params.email + " is already registered";
+        throw "Email " + params.email + " is already registered";
     }
 
     const account = new db.Account(params);
@@ -211,7 +219,7 @@ function basicDetails(account: any) {
 async function sendVerificationEmail(account: any, origin: any) {
     let message;
     if (origin) {
-        const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
+        const verifyUrl = `${origin}/#/account/verify-email?token=${account.verificationToken}`;
         message = `<p>Please click the below link to verify your email address:</p>
            <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
     } else {
@@ -230,7 +238,7 @@ async function sendVerificationEmail(account: any, origin: any) {
 async function sendAlreadyRegisteredEmail(email: any, origin: any) {
     let message;
     if (origin) {
-        message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;
+        message = `<p>If you don't know your password please visit the <a href="${origin}/#/account/forgot-password">forgot password</a> page.</p>`;
     } else {
         message = `<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>`;
     }
@@ -243,16 +251,19 @@ async function sendAlreadyRegisteredEmail(email: any, origin: any) {
     });
 }
 
+// FIXED: Formats the resetUrl precisely with the URL hash fragment to map to the Angular Frontend view loader
 async function sendPasswordResetEmail(account: any, origin: any) {
     let message;
-    if (origin) {
-        const resetUrl = `${origin}/account/reset-password?token=${account.resetToken}`;
-        message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
+    
+    // Fallback directly to port 4200 (Angular UI) if the client origin header is absent
+    const frontendOrigin = origin || 'http://localhost:4200';
+    
+    // NOTICE THE /#/ ADDED HERE: This keeps the page lifecycle strictly inside Angular's router memory context
+    const resetUrl = `${frontendOrigin}/#/account/reset-password?token=${account.resetToken}`;
+    
+    message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
         <p><a href="${resetUrl}">${resetUrl}</a></p>`;
-    } else {
-        message = `<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
-        <p><code>${account.resetToken}</code></p>`;
-    }
+        
     await sendEmail({
         to: account.email,
         subject: 'Sign-up Verification API Reset Password',

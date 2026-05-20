@@ -21,6 +21,7 @@ router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(), updateSchema, update);
 router.delete('/:id', authorize(), _delete);
+
 // Get all registered accounts
 router.get('/all-accounts', async (req, res, next) => {
     try {
@@ -32,6 +33,7 @@ router.get('/all-accounts', async (req, res, next) => {
 });
 
 export default router;
+
 function authenticateSchema(req: any, res: any, next: any) {
     const schema = Joi.object({
         email: Joi.string().required(),
@@ -133,10 +135,17 @@ function forgotPassword(req: any, res: any, next: any) {
         .catch(next);
 }
 
+// FIX: Automatically catch tokens arriving via URL query strings
 function validateResetTokenSchema(req: any, res: any, next: any) {
     const schema = Joi.object({
         token: Joi.string().required()
     });
+
+    // If token isn't in body payload but present in URL query (?token=...), move it to body
+    if (!req.body.token && req.query.token) {
+        req.body.token = req.query.token;
+    }
+
     validateRequest(req, next, schema);
 }
 
@@ -188,6 +197,7 @@ function createSchema(req: any, res: any, next: any) {
     });
     validateRequest(req, next, schema);
 }
+
 function create(req: any, res: any, next: any) {
     accountService.create(req.body)
         .then((account: any) => res.json(account))
@@ -211,7 +221,7 @@ function updateSchema(req: any, res: any, next: any) {
 }
 
 function update(req: any, res: any, next: any) {
-    if (Number(req.params.id) != req.user.id && req.user.role! !== Role.Admin) {
+    if (Number(req.params.id) != req.user.id && req.user.role !== Role.Admin) {
         return res.status(401).json({
             message: 'Unauthorized'
         });
