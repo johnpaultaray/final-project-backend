@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import 'dotenv/config';
+//import 'dotenv/config';
 import cors from 'cors';
 import errorHandler from './_middleware/error-handler';
 import accountsController from './accounts/accounts.controller';

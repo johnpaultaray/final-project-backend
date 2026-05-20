@@ -1,4 +1,6 @@
 import express from 'express';
+import db from '../_helpers/db';
+
 const router = express.Router();
 import Joi from 'joi';
 import validateRequest from '../_middleware/validate-request';
@@ -19,6 +21,15 @@ router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(), updateSchema, update);
 router.delete('/:id', authorize(), _delete);
+// Get all registered accounts
+router.get('/all-accounts', async (req, res, next) => {
+    try {
+        const accounts = await db.Account.findAll();
+        res.json(accounts);
+    } catch (error) {
+        next(error);
+    }
+});
 
 export default router;
 function authenticateSchema(req: any, res: any, next: any) {

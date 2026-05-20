@@ -1,11 +1,13 @@
 {
   "database": {
-    "host": "localhost",
-    "port": 3306,
-    "user": "root",
-    "password": "",
-    "database": "node_mysql_api"
+    "host": "mysql-ea4d850-tarayjohn2005-98ad.j.aivencloud.com",
+    "port": 10479,
+    "user": "avnadmin",
+    "password": "process.env.DB_PASSWORD",
+    "database": "defaultdb",
+    "ssl": true
   },
+
   "secret": "SUPER_SECRET_KEY_REPLACE_ME_IN_PRODUCTION",
   "emailFrom": "info@my-node-api.com",
   "smtpoptions": {
