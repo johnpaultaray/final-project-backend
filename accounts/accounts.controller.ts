@@ -75,8 +75,8 @@ function revokeToken(req: any, res: any, next: any) {
 function registerSchema(req: any, res: any, next: any) {
     const schema = Joi.object({
         title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        firstName: Joi.string().empty(''),
+        lastName: Joi.string().empty(''),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
@@ -163,8 +163,8 @@ function getById(req: any, res: any, next: any) {
 function createSchema(req: any, res: any, next: any) {
     const schema = Joi.object({
         title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        firstName: Joi.string().empty(''),
+        lastName: Joi.string().empty(''),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
