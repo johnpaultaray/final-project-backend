@@ -1,52 +1,73 @@
-import config from '../config.json';
-import mysql from 'mysql2/promise';
-import { Sequelize } from 'sequelize';
-import accountModel from '../accounts/account.model';
-import refreshTokenModel from '../accounts/refresh-token.model';
+import mysql from "mysql2/promise";
+import { Sequelize } from "sequelize";
+import accountModel from "../accounts/account.model";
+import refreshTokenModel from "../accounts/refresh-token.model";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const db: any = {};
 export default db;
+
 initialize();
+
 async function initialize() {
-    const { host, port, user, password, database, ssl }: DatabaseConfig = config.database;
+  const host = process.env.DB_HOST!;
+  const port = Number(process.env.DB_PORT);
+  const user = process.env.DB_USER!;
+  const password = process.env.DB_PASSWORD!;
+  const database = process.env.DB_NAME!;
 
-    // Establish a connection to MySQL with SSL support
-    const connection = await mysql.createConnection({ 
-        host, 
-        port, 
-        user, 
-        password, 
-        ssl: ssl ? { rejectUnauthorized: false } : undefined 
+  // 🔥 STEP 1: TEST RAW CONNECTION (must be SSL-safe)
+    const connection = await mysql.createConnection({
+    host,
+    port,
+    user,
+    password,
+    connectTimeout: 30000,
+    ssl: {
+        rejectUnauthorized: false
+    }
     });
 
-    // Create DB if it doesn't exist
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \
-\`${database}\`;`);
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+  await connection.end();
 
-    // Connect to DB using Sequelize with SSL support
-    const sequelize = new Sequelize(database, user, password, { 
-        dialect: 'mysql',
-        host: host,
-        port: port,
-        dialectOptions: ssl ? { ssl: { rejectUnauthorized: false } } : undefined
-    });
+  // 🔥 STEP 2: SEQUELIZE (FIXED FOR AIVEN)
+  const sequelize = new Sequelize(database, user, password, {
+  host,
+  port,
+  dialect: "mysql",
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    },
+    connectTimeout: 30000
+  },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
+});
 
-    // Init models
-    db.Account = accountModel(sequelize);
-    db.RefreshToken = refreshTokenModel(sequelize);
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Aiven DB connected successfully");
+  } catch (error) {
+    console.error("❌ Sequelize connection failed:", error);
+    throw error;
+  }
 
-    // Define relationships
-    db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
-    db.RefreshToken.belongsTo(db.Account);
+  // Models
+  db.Account = accountModel(sequelize);
+  db.RefreshToken = refreshTokenModel(sequelize);
 
-    // Sync models with database
-    await sequelize.sync();
-}
+  db.Account.hasMany(db.RefreshToken, { onDelete: "CASCADE" });
+  db.RefreshToken.belongsTo(db.Account);
 
-interface DatabaseConfig {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
-  ssl?: boolean;
+  await sequelize.sync();
 }
