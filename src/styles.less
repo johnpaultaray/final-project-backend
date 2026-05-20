@@ -1,0 +1,413 @@
+@import (css) url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-glow: rgba(99, 102, 241, 0.35);
+    --accent: #818cf8;
+    --bg-dark: #0f172a;
+    --bg-card: rgba(30, 41, 59, 0.7);
+    --bg-input: rgba(15, 23, 42, 0.5);
+    --bg-input-focus: rgba(15, 23, 42, 0.8);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-subtle: #64748b;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.18);
+    --danger: #ef4444;
+    --success: #22c55e;
+    --warning: #f59e0b;
+}
+
+/* ─── Base ─── */
+body {
+    font-family: 'Outfit', sans-serif;
+    background: radial-gradient(ellipse at top right, #1e1b4b 0%, #0f172a 40%, #020617 100%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* ─── Glassmorphism Panels ─── */
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+}
+
+.glass-nav {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* ─── Typography ─── */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 0.65rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px 0 var(--primary-glow);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(135deg, var(--primary-hover), #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45);
+    color: #fff;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-outline-light {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    transform: translateY(-2px);
+}
+
+/* ─── Subnav ─── */
+.subnav .nav-link {
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+    color: var(--text-muted);
+}
+
+.subnav .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.subnav .nav-link.active {
+    border-bottom-color: var(--primary);
+    color: white;
+}
+
+/* ─── Form Controls ─── */
+.form-control,
+.form-select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--glass-border);
+    color: white;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    transition: all 0.3s ease;
+    font-family: 'Outfit', sans-serif;
+}
+
+.form-control::placeholder {
+    color: var(--text-subtle);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-input-focus);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
+
+select.form-control {
+    appearance: auto;
+    background-color: var(--bg-input);
+    color: white;
+}
+
+select.form-control option {
+    background-color: #1e293b;
+    color: white;
+}
+
+.form-label {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+}
+
+/* ─── Checkbox ─── */
+.form-check-input {
+    background-color: var(--bg-input);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: var(--primary);
+}
+
+.form-check-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* ─── Validation ─── */
+.invalid-feedback {
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* ─── Links ─── */
+a.text-primary {
+    color: var(--accent) !important;
+    transition: color 0.2s ease;
+}
+
+a.text-primary:hover {
+    color: #a5b4fc !important;
+}
+
+.btn-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.btn-link:hover {
+    color: #a5b4fc;
+}
+
+/* ─── Account Layout ─── */
+.account-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+.account-layout::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+    animation: subtleDrift 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes subtleDrift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, -1%) rotate(1deg); }
+    66% { transform: translate(-1%, 2%) rotate(-1deg); }
+}
+
+.account-brand {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.account-brand .brand-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 4px 20px var(--primary-glow);
+}
+
+.account-brand h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.account-brand p {
+    color: var(--text-subtle);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.account-card-wrapper {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ─── Account Glass Card ─── */
+.account-glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: fadeSlideUp 0.5s ease-out;
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.account-glass .card-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.account-glass .card-subtitle {
+    color: var(--text-subtle);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.account-glass .divider {
+    border-top: 1px solid var(--glass-border);
+    margin: 1.25rem 0;
+}
+
+.account-glass .footer-text {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* ─── Status Card (verify / reset token) ─── */
+.status-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.status-icon.verifying {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent);
+}
+
+.status-icon.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+}
+
+.status-icon.success {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--success);
+}
+
+/* ─── Spinner ─── */
+.spinner-border.text-primary {
+    color: var(--primary) !important;
+}
+
+/* ─── Button delete spinner alignment ─── */
+.btn-delete-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ─── Alert overrides ─── */
+.alert {
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    font-size: 0.875rem;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 576px) {
+    .account-glass {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .account-card-wrapper {
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,27 @@
+<div *ngIf="account$ | async as account" class="account-glass">
+    <h4 class="card-title">My Profile</h4>
+    <p class="card-subtitle">Your account information</p>
+
+    <div class="mb-3">
+        <span class="form-label">Full Name</span>
+        <p class="fw-semibold mb-0" style="font-size: 1.05rem;">{{account.title}} {{account.firstName}} {{account.lastName}}</p>
+    </div>
+
+    <div class="mb-3">
+        <span class="form-label">Email Address</span>
+        <p class="fw-semibold mb-0" style="font-size: 1.05rem;">{{account.email}}</p>
+    </div>
+
+    <div class="mb-4">
+        <span class="form-label">Role</span>
+        <p class="mb-0">
+            <span class="badge" [ngClass]="account.role === 'Admin' ? 'bg-danger' : 'bg-primary'" style="font-size: 0.85rem; padding: 5px 12px; border-radius: 20px;">
+                {{account.role}}
+            </span>
+        </p>
+    </div>
+
+    <a routerLink="update" class="btn btn-primary btn-lg w-100 fw-semibold">
+        Update Profile
+    </a>
+</div>

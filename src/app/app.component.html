@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand navbar-dark glass-nav px-3" *ngIf="account">
+    <div class="container-fluid">
+        <a routerLink="/" class="navbar-brand fw-bold" style="color: var(--primary);">Angular 21 Auth</a>
+        <div class="navbar-collapse collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a routerLink="/" routerLinkActive="active" class="nav-link px-3">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a routerLink="/profile" routerLinkActive="active" class="nav-link px-3">Profile</a>
+                </li>
+                <li class="nav-item" *ngIf="account.role === 'Admin'">
+                    <a routerLink="/admin" routerLinkActive="active" class="nav-link px-3">Admin</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a (click)="logout()" class="nav-link btn btn-outline-danger btn-sm text-white border-0 px-3 py-1 mt-1" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.backgroundColor='rgba(220,53,69,0.2)'" onmouseout="this.style.backgroundColor='transparent'">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<router-outlet name="subnav"></router-outlet>
+
+<div class="container mt-5">
+    <alert></alert>
+    <router-outlet></router-outlet>
+</div>

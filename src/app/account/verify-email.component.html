@@ -1,0 +1,28 @@
+<div class="account-glass">
+    <h4 class="card-title">Verify Email</h4>
+    <p class="card-subtitle">Confirming your email address</p>
+
+    <!-- Verifying State -->
+    <div *ngIf="tokenStatus === TokenStatus.Verifying" class="text-center py-4">
+        <div class="status-icon verifying mx-auto">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+        <p class="text-muted mt-2 mb-0">Verifying your email...</p>
+    </div>
+
+    <!-- Failed State -->
+    <div *ngIf="tokenStatus === TokenStatus.Failed" class="text-center py-4">
+        <div class="status-icon error mx-auto">⚠️</div>
+        <p class="text-danger fw-semibold mb-2">Verification failed</p>
+        <p class="text-muted mb-3" style="font-size: 0.875rem;">
+            The verification link may have expired or is invalid.
+        </p>
+
+        <div class="divider"></div>
+
+        <p class="footer-text">
+            Need a new link?
+            <a routerLink="/account/forgot-password" class="text-primary text-decoration-none fw-semibold">Request one here</a>
+        </p>
+    </div>
+</div>
