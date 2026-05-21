@@ -283,7 +283,7 @@ async function sendAlreadyRegisteredEmail(email: any, origin: any) {
 // FIXED: Formats the resetUrl precisely with the URL hash fragment to map to the Angular Frontend view loader
 async function sendPasswordResetEmail(account: any, origin: any) {
 
-    const frontendOrigin = origin || 'https://final-project-frontend-eo6a.onrender.com;
+    const frontendOrigin = origin || 'https://final-project-frontend-eo6a.onrender.com';
 
     const resetUrl =
         `${frontendOrigin}/account/reset-password?token=${account.resetToken}`;
