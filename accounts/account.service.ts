@@ -41,18 +41,28 @@ async function authenticate({ email, password, ipAddress }: any) {
     };
 }
 
-async function refreshToken({ token, ipAddress }: any) {
+async function refreshToken(req: any) {
+
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+        throw 'Refresh token missing';
+    }
+
     const refreshToken = await getRefreshToken(token);
     const account = await refreshToken.getAccount();
 
-    const newRefreshToken = generateRefreshToken(account, ipAddress);
+    const newRefreshToken = generateRefreshToken(account, req.ip);
+
     refreshToken.revoked = Date.now();
-    refreshToken.revokedByIp = ipAddress;
+    refreshToken.revokedByIp = req.ip;
     refreshToken.replacedByToken = newRefreshToken.token;
+
     await refreshToken.save();
     await newRefreshToken.save();
 
     const jwtToken = generateJwtToken(account);
+
     return {
         ...basicDetails(account),
         jwtToken,
@@ -94,21 +104,27 @@ async function verifyEmail({ token }: any) {
 }
 
 async function forgotPassword({ email }: any, origin: any) {
+
     const account = await db.Account.findOne({ where: { email } });
 
     if (!account) return;
 
     account.resetToken = randomTokenString();
     account.resetTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     await account.save();
 
     await sendPasswordResetEmail(account, origin);
 }
 
 async function validateResetToken(params: any) {
-    const token = typeof params === 'string' ? params : (params?.token || null);
+    const token = typeof params === 'string'
+        ? params
+        : params?.token;
 
-    if (!token) throw 'Invalid token';
+    if (!token) {
+        return { valid: false };
+    }
 
     const account = await db.Account.findOne({
         where: {
@@ -117,21 +133,34 @@ async function validateResetToken(params: any) {
         }
     });
 
-    if (!account) throw 'Invalid or expired token';
-
-    return account;
+    return {
+        valid: !!account
+    };
 }
 
 async function resetPassword({ token, password }: any) {
-    const account = await validateResetToken({ token });
+
+    const account = await db.Account.findOne({
+        where: {
+            resetToken: token,
+            resetTokenExpires: { [Op.gt]: new Date() }
+        }
+    });
+
+    if (!account) {
+        throw 'Invalid or expired token';
+    }
 
     account.passwordHash = await hash(password);
     account.passwordReset = Date.now();
-    account.resetToken = null;
-    account.resetTokenExpires = null; 
-    await account.save();
-}
 
+    account.resetToken = null;
+    account.resetTokenExpires = null;
+
+    await account.save();
+
+    return { success: true };
+}
 async function getAll() {
     const accounts = await db.Account.findAll();
     return accounts.map((x: any) => basicDetails(x));
@@ -253,20 +282,19 @@ async function sendAlreadyRegisteredEmail(email: any, origin: any) {
 
 // FIXED: Formats the resetUrl precisely with the URL hash fragment to map to the Angular Frontend view loader
 async function sendPasswordResetEmail(account: any, origin: any) {
-    let message;
-    
-    // Fallback directly to port 4200 (Angular UI) if the client origin header is absent
+
     const frontendOrigin = origin || 'http://localhost:4200';
-    
-    // NOTICE THE /#/ ADDED HERE: This keeps the page lifecycle strictly inside Angular's router memory context
-    const resetUrl = `${frontendOrigin}/account/reset-password?token=${account.resetToken}`;    
-    message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
-        <p><a href="${resetUrl}">${resetUrl}</a></p>`;
-        
+
+    const resetUrl =
+        `${frontendOrigin}/account/reset-password?token=${account.resetToken}`;
+
     await sendEmail({
         to: account.email,
-        subject: 'Sign-up Verification API Reset Password',
-        html: `<h4>Reset Password Email</h4>
-            ${message}`
+        subject: 'Reset Password',
+        html: `
+            <h3>Reset Password</h3>
+            <p>Click below to reset your password (valid 24 hours):</p>
+            <a href="${resetUrl}">${resetUrl}</a>
+        `
     });
 }
