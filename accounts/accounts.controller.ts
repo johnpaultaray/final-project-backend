@@ -54,10 +54,8 @@ function authenticate(req: any, res: any, next: any) {
 }
 
 function refreshToken(req: any, res: any, next: any) {
-    const token = req.cookies.refreshToken;
+    const token = req.cookies?.refreshToken; // use optional chaining
     const ipAddress = req.ip;
-
-    console.log("Token value:", token, "Type:", typeof token);
 
     if (!token) return res.status(401).json({ message: 'Refresh token is missing' });
 
@@ -66,7 +64,7 @@ function refreshToken(req: any, res: any, next: any) {
             setTokenCookie(res, refreshToken);
             res.json(account);
         })
-        .catch(next);
+        .catch(next); // passes structured error to errorHandler
 }
 
 function revokeTokenSchema(req: any, res: any, next: any) {
