@@ -54,8 +54,10 @@ function authenticate(req: any, res: any, next: any) {
 }
 
 function refreshToken(req: any, res: any, next: any) {
-    const token = req.cookies?.refreshToken; // use optional chaining
+    const token = req.cookies.refreshToken;
     const ipAddress = req.ip;
+
+    console.log("Token value:", token, "Type:", typeof token);
 
     if (!token) return res.status(401).json({ message: 'Refresh token is missing' });
 
@@ -64,7 +66,7 @@ function refreshToken(req: any, res: any, next: any) {
             setTokenCookie(res, refreshToken);
             res.json(account);
         })
-        .catch(next); // passes structured error to errorHandler
+        .catch(next);
 }
 
 function revokeTokenSchema(req: any, res: any, next: any) {
@@ -239,9 +241,20 @@ function _delete(req: any, res: any, next: any) {
 }
 
 function setTokenCookie(res: any, token: any) {
+
     const cookieOptions = {
         httpOnly: true,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+        // ✅ IMPORTANT FOR ANGULAR LOCALHOST
+        secure: false,
+
+        // ✅ IMPORTANT FOR CROSS-ORIGIN REQUESTS
+        sameSite: 'lax',
+
+        expires: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+        )
     };
+
     res.cookie('refreshToken', token, cookieOptions);
 }
