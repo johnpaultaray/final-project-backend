@@ -43,9 +43,6 @@ app.use(cors({
 /* =========================
    PREFLIGHT REQUEST FIX
 ========================= */
-// IMPORTANT: avoid "*" (causes path-to-regexp crash)
-app.options('/*', cors());
-
 /* =========================
    ROUTES
 ========================= */
