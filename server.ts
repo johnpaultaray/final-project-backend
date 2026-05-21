@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+
 import errorHandler from './_middleware/error-handler';
 import accountsController from './accounts/accounts.controller';
 import swaggerDocs from './_helpers/swagger';
@@ -16,7 +17,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 /* =========================
-   CORS CONFIG (FIXED)
+   CORS CONFIG (PRODUCTION SAFE)
 ========================= */
 const allowedOrigins = [
   'https://final-project-frontend-eo6a.onrender.com',
@@ -25,14 +26,14 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
+    // allow mobile apps, postman, server-to-server
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new Error('CORS not allowed'), false);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
 
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -40,9 +41,10 @@ app.use(cors({
 }));
 
 /* =========================
-   HANDLE PREFLIGHT REQUESTS
+   PREFLIGHT REQUEST FIX
 ========================= */
-app.options('*', cors());
+// IMPORTANT: avoid "*" (causes path-to-regexp crash)
+app.options('/*', cors());
 
 /* =========================
    ROUTES
@@ -64,5 +66,5 @@ const port =
     : 4000;
 
 app.listen(port, () =>
-  console.log('Server listening on port ' + port)
+  console.log(`Server listening on port ${port}`)
 );
