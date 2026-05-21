@@ -256,5 +256,10 @@ function setTokenCookie(res: any, token: any) {
         )
     };
 
-    res.cookie('refreshToken', token, cookieOptions);
+    res.cookie('refreshToken', token, {
+    httpOnly: true,
+    secure: true,        // MUST for Render HTTPS
+    sameSite: 'none',    // REQUIRED for cross-domain
+    path: '/'
+});
 }

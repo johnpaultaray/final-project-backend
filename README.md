@@ -60,7 +60,7 @@ npm install
 npm start
 ```
 
-Navigate to `http://localhost:4200`. The app runs with a fake backend by default, so no external API is needed.
+Navigate to `https://final-project-frontend-eo6a.onrender.com`. 
 
 ## Available Scripts
 

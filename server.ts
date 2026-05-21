@@ -17,32 +17,32 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 /* =========================
-   CORS CONFIG (PRODUCTION SAFE)
+   CORS CONFIG (FIXED FOR RENDER + ANGULAR)
 ========================= */
 const allowedOrigins = [
   'https://final-project-frontend-eo6a.onrender.com',
   'http://localhost:4200'
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow mobile apps, postman, server-to-server
+const corsOptions: cors.CorsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // allow requests with no origin (Postman, server-to-server)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    return callback(new Error('Not allowed by CORS'), false);
+    return callback(new Error('CORS blocked'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
 
-/* =========================
-   PREFLIGHT REQUEST FIX
-========================= */
+// Single cors() middleware — handles both regular and OPTIONS preflight requests
+app.use(cors(corsOptions));
+
 /* =========================
    ROUTES
 ========================= */
@@ -59,9 +59,9 @@ app.use(errorHandler);
 ========================= */
 const port =
   process.env.NODE_ENV === 'production'
-    ? (process.env.PORT || 80)
+    ? (process.env.PORT || 10000)
     : 4000;
 
 app.listen(port, () =>
-  console.log(`Server listening on port ${port}`)
+  console.log(`Server running on port ${port}`)
 );
