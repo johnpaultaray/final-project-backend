@@ -15,8 +15,12 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // allow cors requests from frontend and with credentials
-app.use(cors({ origin: ['http://localhost:4200', 'http://localhost:8081', 'http://localhost:8080'], credentials: true }));
-
+app.use(cors({ 
+  origin: [
+    'https://final-project-frontend-eo6a.onrender.com', 
+    'http://localhost:4200'], 
+  credentials: true 
+}));
 // api routes
 app.use('/accounts', accountsController);
 
