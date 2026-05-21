@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(cors({ 
   origin: [
     'https://final-project-frontend-eo6a.onrender.com', 
-    'http://localhost:4200'], 
+], 
   credentials: true 
 }));
 // api routes
