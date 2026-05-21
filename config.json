@@ -9,13 +9,13 @@
   },
 
   "secret": "SUPER_SECRET_KEY_REPLACE_ME_IN_PRODUCTION",
-  "emailFrom": "info@my-node-api.com",
-  "smtpoptions": {
-    "host": "smtp.ethereal.email",
-    "port": 587,
-    "auth": {
-      "user": "camryn.okon40@ethereal.email",
-      "pass": "rHVH3mPkq34kCq2yE2"
+    "emailFrom": "onboarding@resend.dev",
+    "smtpoptions": {
+      "host": "smtp.resend.com",
+      "port": 465,
+      "auth": {
+        "user": "resend",
+        "pass": ""
     }
   }
 }
