@@ -18,41 +18,46 @@ async function initialize() {
   const password = process.env.DB_PASSWORD!;
   const database = process.env.DB_NAME!;
 
-  // 🔥 STEP 1: TEST RAW CONNECTION (must be SSL-safe)
+  // 🔥 STEP 1: TEST RAW CONNECTION (Aiven requires SSL)
+  try {
     const connection = await mysql.createConnection({
-    host,
-    port,
-    user,
-    password,
-    connectTimeout: 30000,
-    ssl: {
-        rejectUnauthorized: false
-    }
+      host,
+      port,
+      user,
+      password,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      connectTimeout: 30000,
     });
 
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-  await connection.end();
-
-  // 🔥 STEP 2: SEQUELIZE (FIXED FOR AIVEN)
-  const sequelize = new Sequelize(database, user, password, {
-  host,
-  port,
-  dialect: "mysql",
-  logging: false,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    },
-    connectTimeout: 30000
-  },
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
+    await connection.end();
+  } catch (err) {
+    console.error("❌ MySQL raw connection failed:", err);
+    throw err;
   }
-});
+
+  // 🔥 STEP 2: SEQUELIZE CONNECTION (Aiven safe config)
+  const sequelize = new Sequelize(database, user, password, {
+    host,
+    port,
+    dialect: "mysql",
+    logging: false,
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
+  });
 
   try {
     await sequelize.authenticate();
@@ -62,7 +67,7 @@ async function initialize() {
     throw error;
   }
 
-  // Models
+  // 🔥 MODELS
   db.Account = accountModel(sequelize);
   db.RefreshToken = refreshTokenModel(sequelize);
 
