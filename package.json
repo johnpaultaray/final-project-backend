@@ -1,12 +1,12 @@
 {
-  "name": "mysql-api",
+  "name": "node-mysql-api",
   "version": "1.0.0",
   "main": "server.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "ts-node server.ts",
     "start:dev": "nodemon --exec ts-node server.ts"
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
