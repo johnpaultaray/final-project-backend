@@ -9,7 +9,7 @@ import Role from '../_helpers/role';
 /* =========================
    CONSTANTS
 ========================= */
-// Updated to fallback to localhost for Ethereal testing
+// Updated to fallback to localhost for Resend testing
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
 
 /* =========================
@@ -126,7 +126,7 @@ async function register(params: any, origin: any) {
     try {
         await sendVerificationEmail(account);
     } catch (error: any) {
-        console.error("Failed to send verification email (Render blocks SMTP on free tier). Auto-verifying account.", error.message);
+        console.error("Failed to send verification email via Resend. Auto-verifying account as fallback.", error.message);
         account.verified = Date.now();
         account.verificationToken = null;
         await account.save();

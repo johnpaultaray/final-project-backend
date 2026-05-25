@@ -78,14 +78,14 @@ async function initialize() {
 
   await sequelize.sync();
 
-  // 🔥 STEP 3: SEED CURRENT ETHEREAL ADMIN USER
+  // 🔥 STEP 3: SEED CURRENT RESEND ADMIN USER
   await seedAdminAccount();
 }
 
 async function seedAdminAccount() {
   try {
-    // Updated to match your new config.json Ethereal user account
-    const adminEmail = "calista.hane70@ethereal.email";
+    // Updated to match your Resend admin user account
+    const adminEmail = "tarayjohn2005@gmail.com";
     
     const accountExists = await db.Account.findOne({ where: { email: adminEmail } });
     
@@ -103,7 +103,7 @@ async function seedAdminAccount() {
         verified: new Date(), // Pre-verified for instant bypass
       });
       
-      console.log(`🌱 Seeded default Ethereal testing account: ${adminEmail}`);
+      console.log(`🌱 Seeded default Resend admin account: ${adminEmail}`);
     }
   } catch (seedError) {
     console.error("⚠️ Database admin seeding skipped or failed:", seedError);
