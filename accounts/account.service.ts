@@ -9,8 +9,8 @@ import Role from '../_helpers/role';
 /* =========================
    CONSTANTS
 ========================= */
-// Updated to fallback to localhost for Resend testing
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
+// Fallback to the Render frontend URL or localhost if specified
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://final-project-frontend-eo6a.onrender.com';
 
 /* =========================
    EXPORT SERVICE OBJECT
