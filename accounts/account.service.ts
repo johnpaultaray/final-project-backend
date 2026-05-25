@@ -105,7 +105,12 @@ async function revokeToken({ token, ipAddress }: any) {
 ========================= */
 async function register(params: any, origin: any) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
-        return sendAlreadyRegisteredEmail(params.email);
+        try {
+            return await sendAlreadyRegisteredEmail(params.email);
+        } catch (error: any) {
+            console.error("Failed to send already registered email", error.message);
+            return; // fail silently so we don't return 500
+        }
     }
 
     const account = new db.Account(params);
@@ -157,7 +162,11 @@ async function forgotPassword({ email }: any, origin: any) {
 
     await account.save();
 
-    await sendPasswordResetEmail(account);
+    try {
+        await sendPasswordResetEmail(account);
+    } catch (error: any) {
+        console.error("Failed to send password reset email", error.message);
+    }
 }
 
 /* =========================
