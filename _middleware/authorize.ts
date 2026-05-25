@@ -1,7 +1,7 @@
 import { expressjwt as jwt } from 'express-jwt';
 import db from '../_helpers/db';
 
-const secret = process.env.JWT_SECRET!;
+const secret = process.env.JWT_SECRET || 'SUPER_SECRET_KEY_REPLACE_ME_IN_PRODUCTION';
 
 export default function authorize(roles: any = []) {
     if (typeof roles == 'string') {

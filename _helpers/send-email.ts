@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import config from '../config.json';
 
 // Define an interface for the function arguments for strict type safety
 interface SendEmailOptions {
@@ -15,17 +14,17 @@ interface SendEmailOptions {
  * to system environment variables for clean configuration management.
  */
 export default async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<void> {
-  // Use the email address specified in config.json, otherwise fallback to a generic domain
-  const emailSender = from || config.emailFrom || 'info@my-node-api.com';
+  // Use the email address specified in env, otherwise fallback to a generic domain
+  const emailSender = from || process.env.EMAIL_FROM || 'info@my-node-api.com';
 
   // Build SMTP configurations cleanly
   const smtpOptions = {
-    host: process.env.SMTP_HOST || config.smtpoptions.host || 'smtp.ethereal.email',
-    port: parseInt(process.env.SMTP_PORT || `${config.smtpoptions.port || 587}`),
+    host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+    port: parseInt(process.env.SMTP_PORT || '587'),
     secure: false, // Must be false for Ethereal port 587 (TLS/STARTTLS)
     auth: {
-      user: process.env.SMTP_USER || config.smtpoptions.auth.user,
-      pass: process.env.SMTP_PASS || config.smtpoptions.auth.pass
+      user: process.env.SMTP_USER || 'ewell.ohara86@ethereal.email',
+      pass: process.env.SMTP_PASS || 'rEjSxtUnxbDdFwQ59S'
     },
     connectionTimeout: 5000,
     greetingTimeout: 5000,

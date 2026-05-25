@@ -1,4 +1,3 @@
-import config from '../config.json';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
@@ -281,7 +280,7 @@ async function hash(password: string) {
 function generateJwtToken(account: any) {
     return jwt.sign(
         { sub: account.id, id: account.id },
-        config.secret,
+        process.env.JWT_SECRET || 'SUPER_SECRET_KEY_REPLACE_ME_IN_PRODUCTION',
         { expiresIn: '15m' }
     );
 }
