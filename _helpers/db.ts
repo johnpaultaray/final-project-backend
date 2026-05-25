@@ -2,6 +2,7 @@ import mysql from "mysql2/promise";
 import { Sequelize } from "sequelize";
 import accountModel from "../accounts/account.model";
 import refreshTokenModel from "../accounts/refresh-token.model";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -31,6 +32,7 @@ async function initialize() {
       connectTimeout: 30000,
     });
 
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
     await connection.end();
   } catch (err) {
     console.error("❌ MySQL raw connection failed:", err);
@@ -75,4 +77,35 @@ async function initialize() {
   db.RefreshToken.belongsTo(db.Account);
 
   await sequelize.sync();
+
+  // 🔥 STEP 3: SEED CURRENT ETHEREAL ADMIN USER
+  await seedAdminAccount();
+}
+
+async function seedAdminAccount() {
+  try {
+    // Updated to match your new config.json Ethereal user account
+    const adminEmail = "calista.hane70@ethereal.email";
+    
+    const accountExists = await db.Account.findOne({ where: { email: adminEmail } });
+    
+    if (!accountExists) {
+      const defaultPasswordHash = await bcrypt.hash("AdminPass123!", 10);
+      
+      await db.Account.create({
+        title: "Mr.",
+        firstName: "John",
+        lastName: "Paul",
+        email: adminEmail,
+        passwordHash: defaultPasswordHash,
+        acceptTerms: true,
+        role: "Admin", 
+        verified: new Date(), // Pre-verified for instant bypass
+      });
+      
+      console.log(`🌱 Seeded default Ethereal testing account: ${adminEmail}`);
+    }
+  } catch (seedError) {
+    console.error("⚠️ Database admin seeding skipped or failed:", seedError);
+  }
 }

@@ -1,63 +1,52 @@
 import nodemailer from 'nodemailer';
 import config from '../config.json';
 
-interface EmailParams {
-    to: string;
-    subject: string;
-    html: string;
-    from?: string;
+// Define an interface for the function arguments for strict type safety
+interface SendEmailOptions {
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
 }
 
-export default async function sendEmail({
-    to,
-    subject,
-    html,
-    from
-}: EmailParams) {
+/**
+ * Sends an email using Nodemailer via Ethereal SMTP.
+ * * It reads directly from config.json by default, with optional fallbacks
+ * to system environment variables for clean configuration management.
+ */
+export default async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<void> {
+  // Use the email address specified in config.json, otherwise fallback to a generic domain
+  const emailSender = from || config.emailFrom || 'info@my-node-api.com';
 
-    // Default sender email
-    const emailFrom =
-        from ||
-        process.env.FROM_EMAIL ||
-        config.emailFrom ||
-        'onboarding@resend.dev';
+  // Build SMTP configurations cleanly
+  const smtpOptions = {
+    host: process.env.SMTP_HOST || config.smtpoptions.host || 'smtp.ethereal.email',
+    port: parseInt(process.env.SMTP_PORT || `${config.smtpoptions.port || 587}`),
+    secure: false, // Must be false for Ethereal port 587 (TLS/STARTTLS)
+    auth: {
+      user: process.env.SMTP_USER || config.smtpoptions.auth.user,
+      pass: process.env.SMTP_PASS || config.smtpoptions.auth.pass
+    },
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000
+  };
 
-    // Create SMTP transporter using Resend
-    const transporter = nodemailer.createTransport({
-        host: process.env.RESEND_SMTP_HOST || 'smtp.resend.com',
-
-        port: Number(process.env.RESEND_SMTP_PORT) || 465,
-
-        secure: true,
-
-        auth: {
-            user: process.env.RESEND_SMTP_USER || 'resend',
-
-            // Your Resend API key
-            pass: process.env.RESEND_SMTP_PASS
-        }
+  // Create the transporter instance
+  const transporter = nodemailer.createTransport(smtpOptions);
+  
+  try {
+    // Attempt to dispatch the email payload
+    await transporter.sendMail({ 
+      from: emailSender, 
+      to, 
+      subject, 
+      html 
     });
-
-    try {
-
-        // Send email
-        const info = await transporter.sendMail({
-            from: emailFrom,
-            to,
-            subject,
-            html
-        });
-
-        console.log('✅ Email sent successfully');
-        console.log(info.messageId);
-
-        return info;
-
-    } catch (error) {
-
-        console.error('❌ Failed to send email');
-        console.error(error);
-
-        throw error;
-    }
+    console.log(`📧 Ethereal test email cleanly dispatched to: ${to}`);
+  } catch (err) {
+    console.error('❗️ Nodemailer Email dispatch failed:', err);
+    // Re-throw the original error so that controllers/services can handle the 500 status code properly
+    throw err; 
+  }
 }

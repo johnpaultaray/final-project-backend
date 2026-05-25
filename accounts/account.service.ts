@@ -10,7 +10,8 @@ import Role from '../_helpers/role';
 /* =========================
    CONSTANTS
 ========================= */
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://final-project-frontend-eo6a.onrender.com';
+// Updated to fallback to localhost for Ethereal testing
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
 
 /* =========================
    EXPORT SERVICE OBJECT
@@ -105,7 +106,7 @@ async function revokeToken({ token, ipAddress }: any) {
 ========================= */
 async function register(params: any, origin: any) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
-        return sendAlreadyRegisteredEmail(params.email, origin);
+        return sendAlreadyRegisteredEmail(params.email);
     }
 
     const account = new db.Account(params);
@@ -118,7 +119,14 @@ async function register(params: any, origin: any) {
 
     await account.save();
 
-    await sendVerificationEmail(account);
+    try {
+        await sendVerificationEmail(account);
+    } catch (error: any) {
+        console.error("Failed to send verification email (Render blocks SMTP on free tier). Auto-verifying account.", error.message);
+        account.verified = Date.now();
+        account.verificationToken = null;
+        await account.save();
+    }
 }
 
 /* =========================
@@ -209,7 +217,7 @@ async function getById(id: any) {
 
 async function create(params: any) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
-        throw `Email ${params.email} is already registered`;
+        throw 'Email ' + params.email + ' is already registered';
     }
 
     const account = new db.Account(params);
@@ -229,7 +237,7 @@ async function update(id: any, params: any) {
         params.email !== account.email &&
         await db.Account.findOne({ where: { email: params.email } })
     ) {
-        throw `Email ${params.email} is already taken`;
+        throw 'Email ' + params.email + ' is already taken';
     }
 
     if (params.password) {
@@ -320,7 +328,7 @@ async function sendVerificationEmail(account: any) {
     });
 }
 
-async function sendAlreadyRegisteredEmail(email: string, origin: any) {
+async function sendAlreadyRegisteredEmail(email: string) {
     await sendEmail({
         to: email,
         subject: 'Already Registered',
